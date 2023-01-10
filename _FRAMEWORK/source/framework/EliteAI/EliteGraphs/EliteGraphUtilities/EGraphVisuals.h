@@ -11,6 +11,9 @@ const Elite::Color START_NODE_COLOR{ 0.f, 1.0f, 0.0f };
 const Elite::Color END_NODE_COLOR{ 1.f, 0.f, 0.f };
 
 const Elite::Color GROUND_NODE_COLOR{ DEFAULT_NODE_COLOR };
+const Elite::Color INTERSECTION_NODE_COLOR{ 0.5f, 0.5f, 0.5f };
+const Elite::Color BUILDING_NODE_COLOR{ 1.f, 0.8f, 0.4f };
+
 const Elite::Color MUD_NODE_COLOR{ 0.4f, 0.2f, 0.f };
 const Elite::Color WATER_NODE_COLOR{ 0.5f, 0.9f, 0.9f };
 

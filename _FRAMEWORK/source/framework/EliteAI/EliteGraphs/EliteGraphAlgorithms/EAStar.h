@@ -56,8 +56,8 @@ namespace Elite
 		NodeRecord currentRecord{ pStartNode, nullptr, 0.0f, GetHeuristicCost(pStartNode, pGoalNode) };
 
 		openList.push_back(currentRecord);
-
 		
+
 		while (openList.empty() == false)
 		{
 			currentRecord = *std::min_element(openList.begin(), openList.end());

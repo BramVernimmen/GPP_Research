@@ -130,7 +130,8 @@ namespace Elite
 		{
 			for (auto c = 0; c < m_NrOfColumns; ++c)
 			{
-				AddConnectionsToAdjacentCells(c, r);
+				// disable standard connections
+				//AddConnectionsToAdjacentCells(c, r);
 			}
 		}
 	}

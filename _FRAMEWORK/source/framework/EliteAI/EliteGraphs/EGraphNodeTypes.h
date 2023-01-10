@@ -62,7 +62,7 @@ namespace Elite
 
 		TerrainType GetTerrainType() const { return m_Terrain; }
 		void SetTerrainType(TerrainType terrain) { m_Terrain = terrain; }
-		Elite::Color GetColor() const 
+		Elite::Color GetColor() const
 		{
 			switch (m_Terrain)
 			{
@@ -71,6 +71,12 @@ namespace Elite
 				break;
 			case TerrainType::Water:
 				return WATER_NODE_COLOR;
+				break;
+			case TerrainType::Building:
+				return BUILDING_NODE_COLOR;
+				break;
+			case TerrainType::Intersection:
+				return INTERSECTION_NODE_COLOR;
 				break;
 			default:
 				return GROUND_NODE_COLOR;

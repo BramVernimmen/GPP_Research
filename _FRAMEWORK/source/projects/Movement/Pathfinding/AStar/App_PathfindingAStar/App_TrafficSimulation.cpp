@@ -39,10 +39,10 @@ void App_TrafficSimulation::Update(float deltaTime)
 	UNREFERENCED_PARAMETER(deltaTime);
 
 	//INPUT
-	bool const middleMousePressed = INPUTMANAGER->IsMouseButtonUp(InputMouseButton::eMiddle);
+	bool const middleMousePressed = INPUTMANAGER->IsMouseButtonUp(InputMouseButton::eLeft);
 	if (middleMousePressed)
 	{
-		MouseData mouseData = { INPUTMANAGER->GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eMiddle) };
+		MouseData mouseData = { INPUTMANAGER->GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eLeft) };
 		Elite::Vector2 mousePos = DEBUGRENDERER2D->GetActiveCamera()->ConvertScreenToWorld({ (float)mouseData.X, (float)mouseData.Y });
 
 		//Find closest node to click pos
@@ -97,17 +97,150 @@ void App_TrafficSimulation::Render(float deltaTime) const
 
 void App_TrafficSimulation::MakeGridGraph()
 {
-	m_pGridGraph = new GridGraph<GridTerrainNode, GraphConnection>(COLUMNS, ROWS, m_SizeCell, false, false, 1.f, 1.5f);
+	m_pGridGraph = new GridGraph<GridTerrainNode, GraphConnection>(COLUMNS, ROWS, m_SizeCell, true, false, 1.f, 1.5f);
 
 	//Setup default terrain
-	m_pGridGraph->GetNode(86)->SetTerrainType(TerrainType::Water);
-	m_pGridGraph->GetNode(66)->SetTerrainType(TerrainType::Water);
-	m_pGridGraph->GetNode(67)->SetTerrainType(TerrainType::Water);
-	m_pGridGraph->GetNode(47)->SetTerrainType(TerrainType::Water);
-	m_pGridGraph->RemoveConnectionsToAdjacentNodes(86);
-	m_pGridGraph->RemoveConnectionsToAdjacentNodes(66);
-	m_pGridGraph->RemoveConnectionsToAdjacentNodes(67);
-	m_pGridGraph->RemoveConnectionsToAdjacentNodes(47);
+	// building 1
+	m_pGridGraph->GetNode(21)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(22)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(23)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(41)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(42)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(43)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(61)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(62)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(63)->SetTerrainType(TerrainType::Building);
+
+	// building 2
+	m_pGridGraph->GetNode(121)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(122)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(123)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(141)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(142)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(143)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(161)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(162)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(163)->SetTerrainType(TerrainType::Building);
+
+	// building 3
+	m_pGridGraph->GetNode(26)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(27)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(28)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(46)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(47)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(48)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(66)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(67)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(68)->SetTerrainType(TerrainType::Building);
+
+	// building 4
+	m_pGridGraph->GetNode(126)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(127)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(128)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(146)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(147)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(148)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(166)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(167)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(168)->SetTerrainType(TerrainType::Building);
+
+	// building 5
+	m_pGridGraph->GetNode(31)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(32)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(33)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(51)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(52)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(53)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(71)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(72)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(73)->SetTerrainType(TerrainType::Building);
+
+	// building 6
+	m_pGridGraph->GetNode(131)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(132)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(133)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(151)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(152)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(153)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(171)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(172)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(173)->SetTerrainType(TerrainType::Building);
+
+	// building 7
+	m_pGridGraph->GetNode(36)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(37)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(38)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(56)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(57)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(58)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(76)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(77)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(78)->SetTerrainType(TerrainType::Building);
+
+	// building 8
+	m_pGridGraph->GetNode(136)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(137)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(138)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(156)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(157)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(158)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(176)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(177)->SetTerrainType(TerrainType::Building);
+	m_pGridGraph->GetNode(178)->SetTerrainType(TerrainType::Building);
+
+
+	// clear all standard generated connections -> disabled this
+	//m_pGridGraph->RemoveConnections();
+
+	// add our directional connections
+	// 
+	// 
+	// starting with the outside ring
+	// vertical connections
+	CreateConnectionsVertical(0, 180, 300);
+	CreateConnectionsVertical(199, 19, 300);
+
+	// now do horizontal connections
+	CreateConnectionsHorizontal(180, 199, 300);
+	CreateConnectionsHorizontal(19, 0, 300);
+
+
+	// start creating connections inside the ring -> will cost more
+	CreateConnectionsHorizontal(80, 99, 300);
+	CreateConnectionsHorizontal(119, 100, 300);
+
+	CreateConnectionsVertical(184, 4, 500.f);
+	CreateConnectionsVertical(5, 185, 500.f);
+	CreateConnectionsVertical(189, 9, 500.f);
+	CreateConnectionsVertical(10, 190, 500.f);
+	CreateConnectionsVertical(194, 14, 500.f);
+	CreateConnectionsVertical(15, 195, 500.f);
+
+
+	// when popping a u-ey isn't allowed, we can change the cost of using an intersection.
+	// because of the directional graph, you can complete a route with using only 3 intersection connections.
+	// so making it really expensive to use 4 for a u-ey should give a fix.
+
+	float intersectionCost{ 2500.f };
+	//// change the connection costs of the 2x2 intersections
+	ChangeIntersectionConnectionCosts(104, 84, 85, 105, intersectionCost);
+	ChangeIntersectionConnectionCosts(109, 89, 90, 110, intersectionCost);
+	ChangeIntersectionConnectionCosts(114, 94, 95, 115, intersectionCost);
+
+
+	m_pGridGraph->GetNode(104)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(84)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(85)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(105)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(109)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(89)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(90)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(110)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(114)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(94)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(95)->SetTerrainType(TerrainType::Intersection);
+	m_pGridGraph->GetNode(115)->SetTerrainType(TerrainType::Intersection);
+
 }
 
 void App_TrafficSimulation::UpdateImGui()
@@ -148,7 +281,7 @@ void App_TrafficSimulation::UpdateImGui()
 
 		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
 
-		ImGui::Text("Middle Mouse");
+		ImGui::Text("Left Mouse Button");
 		ImGui::Text("controls");
 		std::string buttonText{ "" };
 		if (m_StartSelected)
@@ -225,4 +358,55 @@ void App_TrafficSimulation::CalculatePath()
 		std::cout << "No valid start and end node..." << std::endl;
 		m_vPath.clear();
 	}
+}
+
+
+void App_TrafficSimulation::CreateConnectionsVertical(int startNode, int endNode, float cost)
+{
+	if (startNode > endNode) // we go from up to down
+	{
+		for (int i{ startNode }; i > endNode; i -= 20)
+		{
+			m_pGridGraph->AddConnection(new GraphConnection2D(i, i - 20, cost));
+		}
+	}
+	else
+	{
+		for (int i{ startNode }; i < endNode; i += 20)
+		{
+			m_pGridGraph->AddConnection(new GraphConnection2D(i, i + 20, cost));
+		}
+	}
+
+
+}
+
+void App_TrafficSimulation::CreateConnectionsHorizontal(int startNode, int endNode, float cost)
+{
+	if (startNode > endNode) // we go from up to down
+	{
+		for (int i{ startNode }; i > endNode; --i)
+		{
+			m_pGridGraph->AddConnection(new GraphConnection2D(i, i - 1, cost));
+		}
+	}
+	else
+	{
+		for (int i{ startNode }; i < endNode; ++i)
+		{
+			m_pGridGraph->AddConnection(new GraphConnection2D(i, i + 1, cost));
+		}
+	}
+}
+
+void App_TrafficSimulation::ChangeIntersectionConnectionCosts(int firstNode, int secondNode, int thirdNode, int fourthNode, float cost)
+{
+	//m_pGridGraph->AddConnection(new GraphConnection2D(fourthNode, thirdNode, cost));
+	//m_pGridGraph->AddConnection(new GraphConnection2D(secondNode, firstNode, cost));
+
+
+	m_pGridGraph->GetConnection(firstNode, secondNode)->SetCost(cost); // vertical
+	m_pGridGraph->GetConnection(secondNode, thirdNode)->SetCost(cost); // horizontal
+	m_pGridGraph->GetConnection(thirdNode, fourthNode)->SetCost(cost); // vertical
+	m_pGridGraph->GetConnection(fourthNode, firstNode)->SetCost(cost); // horizontal
 }

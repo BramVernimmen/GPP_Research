@@ -66,6 +66,12 @@ private:
 	void UpdateImGui();
 	void CalculatePath();
 
+	void CreateConnectionsVertical(int startNode, int endNode, float cost = 30.f);
+	void CreateConnectionsHorizontal(int startNode, int endNode, float cost = 30.f);
+
+	void ChangeIntersectionConnectionCosts(int firstNode, int secondNode, int thirdNode, int fourthNode, float cost = 500.f);
+
+
 	//C++ make the class non-copyable
 	App_TrafficSimulation(const App_TrafficSimulation&) = delete;
 	App_TrafficSimulation& operator=(const App_TrafficSimulation&) = delete;
