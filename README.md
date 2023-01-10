@@ -45,4 +45,11 @@ We will have a clear view of each street and Two-Way streets will be bigger.
 Let's get started on creating this grid!
 
 
+After making connections and adding building to our grid, we have this beauty!
+![First_Grid_Image](/Assets/Images/Gifs/Step1_FirstGrid.gif)
+
+I do need to keep in mind, because of the intersections, U turns are allowed.
+
+### Step 2 - Adding a car
+
 
