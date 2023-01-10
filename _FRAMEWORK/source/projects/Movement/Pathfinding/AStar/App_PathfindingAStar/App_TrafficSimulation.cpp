@@ -62,10 +62,11 @@ void App_TrafficSimulation::Update(float deltaTime)
 	UpdateImGui();
 
 	//UPDATE/CHECK GRID HAS CHANGED
-	if (m_pGraphEditor->UpdateGraph(m_pGridGraph))
+	// this uses the editor, this let's u place nodes, no need to use this in this app, keep commented for now
+	/*if (m_pGraphEditor->UpdateGraph(m_pGridGraph))
 	{
 		CalculatePath();
-	}
+	}*/
 }
 
 void App_TrafficSimulation::Render(float deltaTime) const
@@ -122,15 +123,15 @@ void App_TrafficSimulation::UpdateImGui()
 		bool windowActive = true;
 		ImGui::SetNextWindowPos(ImVec2((float)width - menuWidth - 10, 10));
 		ImGui::SetNextWindowSize(ImVec2((float)menuWidth, (float)height - 20));
-		ImGui::Begin("Gameplay Programming", &windowActive, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+		ImGui::Begin("Traffic Simulation", &windowActive, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 		ImGui::PushAllowKeyboardFocus(false);
 
-		//Elements
-		ImGui::Text("CONTROLS");
-		ImGui::Indent();
-		ImGui::Text("LMB: target");
-		ImGui::Text("RMB: start");
-		ImGui::Unindent();
+		////Elements // old controls, no need to show
+		//ImGui::Text("CONTROLS");
+		//ImGui::Indent();
+		//ImGui::Text("LMB: target");
+		//ImGui::Text("RMB: start");
+		//ImGui::Unindent();
 
 		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
 
@@ -142,8 +143,10 @@ void App_TrafficSimulation::UpdateImGui()
 
 		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
 
-		ImGui::Text("A* Pathfinding");
+		ImGui::Text("Using A* Pathfinding");
 		ImGui::Spacing();
+
+		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Text("Middle Mouse");
 		ImGui::Text("controls");
@@ -158,11 +161,14 @@ void App_TrafficSimulation::UpdateImGui()
 			m_StartSelected = !m_StartSelected;
 		}
 
+		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
+
 		ImGui::Checkbox("Grid", &m_DebugSettings.DrawNodes);
 		ImGui::Checkbox("NodeNumbers", &m_DebugSettings.DrawNodeNumbers);
 		ImGui::Checkbox("Connections", &m_DebugSettings.DrawConnections);
 		ImGui::Checkbox("Connections Costs", &m_DebugSettings.DrawConnectionCosts);
-		if (ImGui::Combo("", &m_SelectedHeuristic, "Manhattan\0Euclidean\0SqrtEuclidean\0Octile\0Chebyshev", 4))
+		// next let's us change the heuristic, we just want to use the default, so comment it
+		/*if (ImGui::Combo("", &m_SelectedHeuristic, "Manhattan\0Euclidean\0SqrtEuclidean\0Octile\0Chebyshev", 4))
 		{
 			switch (m_SelectedHeuristic)
 			{
@@ -185,7 +191,7 @@ void App_TrafficSimulation::UpdateImGui()
 				m_pHeuristicFunction = HeuristicFunctions::Chebyshev;
 				break;
 			}
-		}
+		}*/
 		ImGui::Spacing();
 
 		//End
