@@ -197,35 +197,24 @@ void App_TrafficSimulation::MakeGridGraph()
 	// 
 	// starting with the outside ring
 	// vertical connections
-	CreateConnectionsVertical(0, 180, 300);
-	CreateConnectionsVertical(199, 19, 300);
+	CreateConnectionsVertical(0, 180, 30);
+	CreateConnectionsVertical(199, 19, 30);
 
 	// now do horizontal connections
-	CreateConnectionsHorizontal(180, 199, 300);
-	CreateConnectionsHorizontal(19, 0, 300);
+	CreateConnectionsHorizontal(180, 199, 30);
+	CreateConnectionsHorizontal(19, 0, 30);
 
 
 	// start creating connections inside the ring -> will cost more
-	CreateConnectionsHorizontal(80, 99, 300);
-	CreateConnectionsHorizontal(119, 100, 300);
+	CreateConnectionsHorizontal(80, 99, 50);
+	CreateConnectionsHorizontal(119, 100, 50);
 
-	CreateConnectionsVertical(184, 4, 500.f);
-	CreateConnectionsVertical(5, 185, 500.f);
-	CreateConnectionsVertical(189, 9, 500.f);
-	CreateConnectionsVertical(10, 190, 500.f);
-	CreateConnectionsVertical(194, 14, 500.f);
-	CreateConnectionsVertical(15, 195, 500.f);
-
-
-	// when popping a u-ey isn't allowed, we can change the cost of using an intersection.
-	// because of the directional graph, you can complete a route with using only 3 intersection connections.
-	// so making it really expensive to use 4 for a u-ey should give a fix.
-
-	float intersectionCost{ 2500.f };
-	//// change the connection costs of the 2x2 intersections
-	ChangeIntersectionConnectionCosts(104, 84, 85, 105, intersectionCost);
-	ChangeIntersectionConnectionCosts(109, 89, 90, 110, intersectionCost);
-	ChangeIntersectionConnectionCosts(114, 94, 95, 115, intersectionCost);
+	CreateConnectionsVertical(184, 4, 50.f);
+	CreateConnectionsVertical(5, 185, 50.f);
+	CreateConnectionsVertical(189, 9, 50.f);
+	CreateConnectionsVertical(10, 190, 50.f);
+	CreateConnectionsVertical(194, 14, 50.f);
+	CreateConnectionsVertical(15, 195, 50.f);
 
 
 	m_pGridGraph->GetNode(104)->SetTerrainType(TerrainType::Intersection);
@@ -342,6 +331,19 @@ void App_TrafficSimulation::CalculatePath()
 		&& endPathIdx != invalid_node_index
 		&& startPathIdx != endPathIdx)
 	{
+		// before calculating our path, change the cost of the intersections
+		// after calculating, change it back
+
+		// the reason why we do this is because otherwise we will always do U turns
+		// making them really expensive right before calculating, prevents this
+
+		float intersectionCost{ 250.f };
+		//// change the connection costs of the 2x2 intersections
+		m_pGridGraph->GetConnection(80, 100)->SetCost(intersectionCost); // vertical
+		m_pGridGraph->GetConnection(119, 99)->SetCost(intersectionCost); // vertical
+		ChangeIntersectionConnectionCosts(104, 84, 85, 105, intersectionCost);
+		ChangeIntersectionConnectionCosts(109, 89, 90, 110, intersectionCost);
+		ChangeIntersectionConnectionCosts(114, 94, 95, 115, intersectionCost);
 		//BFS Pathfinding
 		//auto pathfinder = BFS<GridTerrainNode, GraphConnection>(m_pGridGraph);
 		auto pathfinder = AStar<GridTerrainNode, GraphConnection>(m_pGridGraph, m_pHeuristicFunction);
@@ -350,6 +352,14 @@ void App_TrafficSimulation::CalculatePath()
 
 		m_vPath = pathfinder.FindPath(startNode, endNode);
 
+		float redoInterdectionCostFastLane{ 50 };
+		float redoInterdectionCostSlowLane{ 30 };
+		//// change the connection costs of the 2x2 intersections
+		ChangeIntersectionConnectionCosts(104, 84, 85, 105, redoInterdectionCostFastLane);
+		ChangeIntersectionConnectionCosts(109, 89, 90, 110, redoInterdectionCostFastLane);
+		ChangeIntersectionConnectionCosts(114, 94, 95, 115, redoInterdectionCostFastLane);
+		m_pGridGraph->GetConnection(80, 100)->SetCost(redoInterdectionCostSlowLane); // vertical
+		m_pGridGraph->GetConnection(119, 99)->SetCost(redoInterdectionCostSlowLane); // vertical
 
 		std::cout << "New Path Calculated" << std::endl;
 	}
