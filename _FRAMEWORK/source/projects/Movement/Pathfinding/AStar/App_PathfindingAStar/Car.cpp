@@ -25,7 +25,7 @@ Car::Car(const Elite::Vector2& startPos, const Elite::Vector2& endPos, const Eli
 
 	//SetMaxLinearSpeed(25.f);
 	//SetMaxLinearSpeed(16.66f);
-	SetMaxLinearSpeed(0.0f);
+	SetMaxLinearSpeed(10.0f);
 }
 
 

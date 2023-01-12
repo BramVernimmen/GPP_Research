@@ -69,8 +69,11 @@ void App_TrafficSimulation::Start()
 	m_pCarsVec.reserve(m_AmountOfCars);
 	for (int i{ 0 }; i < m_AmountOfCars; ++i)
 	{
+		int randomNodeIdx{ 42 };
+
+		// to start we set the index to a known building node; this will make us enter the while loop
+
 		// get a randomPos that isn't a building
-		int randomNodeIdx{ rand() % m_AmountOfNodes };
 		// check if the index isn't in the vector
 		// this keeps multiple cars for spawning on the same node
 		while (m_pGridGraph->GetNode(randomNodeIdx)->GetTerrainType() == TerrainType::Building)
@@ -128,11 +131,32 @@ void App_TrafficSimulation::Start()
 
 		// set the car decisionmaking
 		newCar->SetDecisionMaking(pBehaviorTree);
-		Elite::Rect test{};
 
 		m_pCarsVec.push_back(newCar);
+
+
+		
 	}
 
+	// create traffic lights
+	// the horizontal and vertical ones should be out of sync
+	// start with the horizontals
+	const float maxTime{ 8.f };
+	m_TrafficLights.push_back(TrafficLight{ 83, 84, maxTime, true });
+	m_TrafficLights.push_back(TrafficLight{ 106, 105, maxTime, true });
+	m_TrafficLights.push_back(TrafficLight{ 88, 89, maxTime, true });
+	m_TrafficLights.push_back(TrafficLight{ 111, 110, maxTime, true });
+	m_TrafficLights.push_back(TrafficLight{ 93, 94, maxTime, true });
+	m_TrafficLights.push_back(TrafficLight{ 116, 115, maxTime, true });
+
+	// now do the veritcals
+	const float minTime{ 0.0f };
+	m_TrafficLights.push_back(TrafficLight{ 124, 104, minTime, false });
+	m_TrafficLights.push_back(TrafficLight{ 65, 85, minTime, false });
+	m_TrafficLights.push_back(TrafficLight{ 129, 109, minTime, false });
+	m_TrafficLights.push_back(TrafficLight{ 70, 90, minTime, false });
+	m_TrafficLights.push_back(TrafficLight{ 134, 114, minTime, false });
+	m_TrafficLights.push_back(TrafficLight{ 75, 95, minTime, false });
 }
 
 void App_TrafficSimulation::Update(float deltaTime)
@@ -175,6 +199,31 @@ void App_TrafficSimulation::Update(float deltaTime)
 	for (auto& currCar : m_pCarsVec)
 	{
 		currCar->Update(deltaTime);
+	}
+
+	for (auto& currTrafficLight : m_TrafficLights)
+	{
+		if (currTrafficLight.currTime >= currTrafficLight.maxTime)
+		{
+			currTrafficLight.isRed = true;
+		}
+		else if (currTrafficLight.currTime <= 0.0f)
+		{
+			currTrafficLight.isRed = false;
+		}
+
+		if (currTrafficLight.isRed == true)
+		{
+			// change the connection cost to 0
+			currTrafficLight.currTime -= deltaTime;
+			m_pGridGraph->GetConnection(currTrafficLight.fromNodeIdx, currTrafficLight.toNodeIdx)->SetCost(0.0f);
+		}
+		else
+		{
+			currTrafficLight.currTime += deltaTime;
+			// traffic lights are only at intersections, so we can change it to 50 again
+			m_pGridGraph->GetConnection(currTrafficLight.fromNodeIdx, currTrafficLight.toNodeIdx)->SetCost(50.f);
+		}
 	}
 }
 
@@ -225,8 +274,8 @@ void App_TrafficSimulation::Render(float deltaTime) const
 		const Elite::Vector2 carPos{ m_pCarsVec[0]->GetPosition() };
 		const float radius{ 40.f };
 		const float baseRotation{ m_pCarsVec[0]->GetRotation() };
-		float startAngle{ baseRotation - Elite::ToRadians(75.f) };
-		float endAngle{ baseRotation + Elite::ToRadians(20.f) };
+		float startAngle{ baseRotation - Elite::ToRadians(85.f) };
+		float endAngle{ baseRotation + Elite::ToRadians(30.f) };
 
 		// correct them if neccessary
 		if (startAngle < -static_cast<float>(M_PI))
@@ -249,6 +298,22 @@ void App_TrafficSimulation::Render(float deltaTime) const
 	}
 	
 
+	for (const auto& currTrafficLight : m_TrafficLights)
+	{
+		Elite::Color lightColor;
+		if (currTrafficLight.isRed == true)
+		{
+			// draw a red square
+			lightColor = Elite::Color{ 1.f, 0.f, 0.f , 0.5f};
+		}
+		else
+		{
+			// draw a green square
+			lightColor = Elite::Color{ 0.f, 1.f, 0.f , 0.5f};
+		}
+
+		DEBUGRENDERER2D->DrawSolidCircle(m_pGridGraph->GetNodeWorldPos(currTrafficLight.fromNodeIdx), m_SizeCell / 4.f, { 0,0 }, lightColor, 0.0f);
+	}
 }
 
 void App_TrafficSimulation::MakeGridGraph()

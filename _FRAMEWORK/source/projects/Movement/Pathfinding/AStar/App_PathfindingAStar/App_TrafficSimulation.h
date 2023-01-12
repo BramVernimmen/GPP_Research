@@ -19,6 +19,16 @@ class NavigationColliderElement;
 class App_TrafficSimulation final : public IApp
 {
 public:
+
+	struct TrafficLight final 
+	{
+		int fromNodeIdx;
+		int toNodeIdx;
+		float currTime;
+		bool isRed;
+		const float maxTime{ 8.f };
+	};
+
 	//Constructor & Destructor
 	App_TrafficSimulation() = default;
 	virtual ~App_TrafficSimulation();
@@ -36,6 +46,8 @@ private:
 
 	std::vector<NavigationColliderElement*> m_vNavigationColliders = {};
 
+	std::vector<TrafficLight> m_TrafficLights{};
+
 	struct DebugSettings
 	{
 		bool DrawNodes{ true };
@@ -44,7 +56,7 @@ private:
 		bool DrawConnectionCosts{ false };
 	};
 
-	bool m_DrawFirstPath{ true };
+	bool m_DrawFirstPath{ false };
 	bool m_DrawDebugRadius{ false };
 
 

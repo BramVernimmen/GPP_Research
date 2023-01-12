@@ -288,8 +288,8 @@ namespace BT_Conditions
 		const Elite::Vector2 carPos{ pCar->GetPosition() };
 		const float radius{ 40.f };
 		const float baseRotation{ pCar->GetRotation() };
-		float startAngle{baseRotation - Elite::ToRadians(75.f)};
-		float endAngle{baseRotation + Elite::ToRadians(20.f) };
+		float startAngle{baseRotation - Elite::ToRadians(85.f)};
+		float endAngle{baseRotation + Elite::ToRadians(30.f) };
 
 		// correct them if neccessary
 		if (startAngle < -static_cast<float>(M_PI))
@@ -311,33 +311,48 @@ namespace BT_Conditions
 		if (pBlackboard->GetData("CarsVector", pCarsVec) == false)
 			return false;
 
+		// check all cars and take the closest one
+		// calculate behavior on that one
+		Car* currClosestCar{ nullptr };
+		float currClosestDistance{FLT_MAX};
 
 		for (const auto& currCar : *pCarsVec)
 		{
 			if (currCar == pCar)
 				continue;
+
 			if (Elite::IsPointInCone(currCar->GetPosition(), carPos, radius, startAngle, endAngle))
 			{
-				// check if they are moving, if they aren't, they could be at a red light
-				if (currCar->GetMaxLinearSpeed() != 0.0f)
+				const float newDistance{ Elite::DistanceSquared(carPos, currCar->GetPosition()) };
+				if (newDistance <= currClosestDistance)
 				{
-					// check the angle between the cars, if the one in our cone is going to the right, there is no need to slow down
-					// if there is one in front of use, depending on the distance, we should slow down
-					const float angleBetweenCars{ Elite::AngleBetween(pCar->GetDirection(), currCar->GetDirection()) };
-					
-					if (angleBetweenCars <= 0.5f && angleBetweenCars >= -0.5f)
-					{
-						// car is in front of use
-						if (Elite::DistanceSquared(carPos, currCar->GetPosition()) <= ((radius / 2.f) * (radius / 2.f)))
-							return true; // too close; slow down
-					}
-					else if (angleBetweenCars >= 1.f && angleBetweenCars <= 2.f) // if the angle is around 90° and is positive, the car is moving towards us; we need to stop
-						return true;
-					//std::cout << angleBetweenCars << "\n";
-
+					currClosestDistance = newDistance;
+					currClosestCar = currCar;
 				}
 			}
 		}
+
+		if (currClosestCar == nullptr) // no car has been found
+			return false;
+
+		// check the angle between the cars, if the one in our cone is going to the right, there is no need to slow down
+					// if there is one in front of use, depending on the distance, we should slow down
+		const float angleBetweenCars{ Elite::AngleBetween(pCar->GetDirection(), currClosestCar->GetDirection()) };
+
+		if (angleBetweenCars <= 0.75f && angleBetweenCars >= -0.75f)
+		{
+			// car is in front of use
+			if (Elite::DistanceSquared(carPos, currClosestCar->GetPosition()) <= ((radius / 2.f) * (radius / 2.f)))
+				return true; // too close; slow down
+		}
+		else if (angleBetweenCars >= 1.f && angleBetweenCars <= 2.f) // if the angle is around 90° and is positive, the car is moving towards us; we need to stop
+		{
+			// check if they are moving, if they aren't, they could be at a red light
+			if (currClosestCar->GetMaxLinearSpeed() != 0.0f)
+				return true;
+		}
+
+
 
 		return false;
 	}
