@@ -72,4 +72,44 @@ At times our path will contain a U turn, but this only happens when the path is 
 
 ### Step 2 - Adding a car
 
+#### ***The "Car" Class***
+<br />
+<br />
+We need a way to render and move our Cars, for this we will create a Car Class.
+
+It inherits from the SteeringAgent Class from our teachers. This one works with a RigidBody system that uses physics to move.
+
+In this class we will be making a SteeringBehavior that Uses the "Seek" methode. It will calculate a steering based on the next point in our path.
+
+This class will also contain our path, which will be a list of Points. We want to visit every Point in this list, after that calculate a new path.
+<br />
+#### ***The Behavior Tree***
+<br />
+<br />
+When creating the car, we will need to give it a way to control itself. We do this by using a Behavior Tree.
+
+This Behavior Tree will not be complicated. When updating our BT, we will be checking all these options and excecuting the first that returns true:
+
+  - If we have arrived at our final position; we calculate a new path.
+  - If we are at our next position in our path; we remove this from our path and seek the next point;
+  - we change our speed depending on the connection cost.
+  
+ These are 3 really simpel things to do, that will cause our car to move.
+ <br />
+ #### ***Spawning the Car***
+ <br />
+ <br />
+ We have our Car class and a BehaviorTree that will be capable of moving the car; so now we just spawn them.
+ We need to spawn the Car at the center of a random Cell of the Grid. Prepare some safety checks; we don't want a car to spawn in a building, and we might aswell take care of keeping track in which Cell a car has spawned. This will be used when spawning multiple cars to avoid overlap on spawn.
+ 
+ When a starting position has been decided, we can make the end Position the same as our start. Our Behavior Tree will see that we are in the final cell and will calculate a new path for us!
+ 
+ 
+ After doing all these small things; we can finally see a car moving!
+ 
+ ![Moving_First_Car_Image](/Assets/Images/Gifs/Step2_FirstCar.gif)
+ 
+ The car is moving really slow, because of the RigidBody system it has a hard time turning, so making it go faster will make the car go off track.
+ 
+ Slowing the car down by 4 times is currently the only option.
 
