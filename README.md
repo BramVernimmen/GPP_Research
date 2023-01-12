@@ -6,8 +6,8 @@ The code is made using a c++ framework made by our teachers.
 
 All PathFinding is done using A*.
 
-### Result
-Image of result coming soon
+### Gif of the Result
+![Results_Image](/Assets/Images/Gifs/Result_TrafficSimulation.gif)
 
 
 ## Implementation
@@ -68,7 +68,7 @@ Doing so will result in this! It looks a lot cleaner now.
 
 ![First_Grid_Problem_Image](/Assets/Images/Gifs/Step1_FirstGrid.gif)
 
-At times our path will contain a U turn, but this only happens when the path is really small.
+At times our path will contain a U turn, but this only happens when the path is really small. <br /> <br />
 
 ### Step 2 - Adding a car
 
@@ -112,7 +112,7 @@ This Behavior Tree will not be complicated. When updating our BT, we will be che
  
  The car is moving really slow, because of the RigidBody system it has a hard time turning, so making it go faster will make the car go off track.
  
- Slowing the car down by 4 times is currently the only option.
+ Slowing the car down by 4 times is currently the only option. <br /> <br />
 
 ### Step 3 - Making Multiple Cars Aware <br /> <br />
 
@@ -164,6 +164,75 @@ Before slowing down, make sure to check that the other car is moving. Doing this
 When we set our MaxLinearSpeed to 0.0f to slow down, we can see that our cars will stop when needed!
 
  ![Cars_GivingWay_Image](/Assets/Images/Gifs/Step3_GivingWay.gif)
+
+<br /> <br />
+
+### Step 4 - Adding Traffic Lights <br /> <br />
+
+
+One final thing to add that will make this city look more lively are Traffic Lights.
+
+These shouldn't be hard to implement.
+
+So what does a Traffic Light need?
+
+  - A timer for when to change the light
+  - A bool to see if the light is red
+  - 2 nodeIndexes too make a connection so we can change the value. <br />
+
+
+We only want to have traffic lights around our intersections, and let's make them change color every 8 seconds.
+
+The bool will be used to change the Connection Cost between the 2 nodes; when it's red, change it to 0 otherwise put it back at 50.<br /> <br />
+
+We can then draw these lights to show if they work. 
+
+ ![Working_Traffic_Lights_Image](/Assets/Images/Gifs/Step4_TrafficLights.gif)
+ 
+ And they do!
+ 
+ It might look like some cars are running it, but as long as they stop on the node of the light, they are following the rules. <br /> <br />
+ 
+ 
+ 
+## Result
+
+Here we have a few seconds of our traffic system in full display!
+
+![Results_Image](/Assets/Images/Gifs/Result_TrafficSimulation.gif)
+
+
+## In Conclusion
+
+And that is about it, thank you for reading this far!
+
+This might be a very basic traffic system, but it might be a start to something greater. 
+
+It was very fun to work on this and would do it again in a heartbeat. <br /><br />
+
+There are 2 major things I learned out of this quick exercise:
+ 
+  - It's a nightmare to debug a Behavior Tree of multiple entities.
+  - Working with something Physics-based is not easy to get started with. <br /><br />
+
+
+
+### What could be improved on?
+If you run the code yourself, you might notice that there are still some things left unaccounted for; some crashes might still occur.
+
+*(I mean car crashes, not application crashes)* <br /><br />
+
+The physics system of the framework I used is still very foreign for me, exploring this more would help improve everything.
+
+Right now the roads are still just straight, adding turns and twists might be a fun addition yet could be challenging.
+
+There are some formulas that should be applied; eg. the distance to keep between cars,...  <br /><br />
+
+If there is anything you think might improve this Application; feel free to contact me!
+
+
+
+
 
 
 
