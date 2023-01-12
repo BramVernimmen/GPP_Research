@@ -46,6 +46,7 @@
     <ClCompile Include="projects\DecisionMaking\BehaviorTrees\App_AgarioGame_BT.cpp" />
     <ClCompile Include="framework\EliteAI\EliteDecisionMaking\EliteBehaviorTree\EBehaviorTree.cpp" />
     <ClCompile Include="projects\Movement\Pathfinding\AStar\App_PathfindingAStar\App_TrafficSimulation.cpp" />
+    <ClCompile Include="projects\Movement\Pathfinding\AStar\App_PathfindingAStar\Car.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projects\App_Selector.h" />
@@ -140,6 +141,8 @@
     <ClInclude Include="projects\DecisionMaking\BehaviorTrees\App_AgarioGame_BT.h" />
     <ClInclude Include="framework\EliteAI\EliteDecisionMaking\EliteBehaviorTree\EBehaviorTree.h" />
     <ClInclude Include="projects\Movement\Pathfinding\AStar\App_PathfindingAStar\App_TrafficSimulation.h" />
+    <ClInclude Include="projects\Movement\Pathfinding\AStar\App_PathfindingAStar\Car.h" />
+    <ClInclude Include="projects\Movement\Pathfinding\AStar\App_PathfindingAStar\Behaviors.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />

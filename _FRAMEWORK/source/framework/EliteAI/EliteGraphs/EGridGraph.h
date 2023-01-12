@@ -44,6 +44,10 @@ namespace Elite
 
 		void AddConnectionsToAdjacentCells(int col, int row);
 		void AddConnectionsToAdjacentCells(int idx);
+
+		void ChangeIntersectionConnectionCosts(int firstNode, int secondNode, int thirdNode, int fourthNode, float cost = 50.f);
+
+
 	private:
 		
 		int m_NrOfColumns;
@@ -164,6 +168,15 @@ namespace Elite
 	{
 		auto colRow = GetNodePos(idx);
 		AddConnectionsToAdjacentCells((int)colRow.x, (int)colRow.y);
+	}
+
+	template<class T_NodeType, class T_ConnectionType>
+	inline void GridGraph<T_NodeType, T_ConnectionType>::ChangeIntersectionConnectionCosts(int firstNode, int secondNode, int thirdNode, int fourthNode, float cost)
+	{
+		GetConnection(firstNode, secondNode)->SetCost(cost); // vertical
+		GetConnection(secondNode, thirdNode)->SetCost(cost); // horizontal
+		GetConnection(thirdNode, fourthNode)->SetCost(cost); // vertical
+		GetConnection(fourthNode, firstNode)->SetCost(cost); // horizontal
 	}
 
 	template<class T_NodeType, class T_ConnectionType>

@@ -1,10 +1,15 @@
 //Precompiled Header [ALWAYS ON TOP IN CPP]
 #include "stdafx.h"
 
+
 //Includes
 #include "App_TrafficSimulation.h"
 #include "framework\EliteAI\EliteGraphs\EliteGraphAlgorithms\EAstar.h"
 #include "framework\EliteAI\EliteGraphs\EliteGraphAlgorithms\EBFS.h"
+#include "Car.h"
+#include "Behaviors.h"
+#include "projects/Shared/NavigationColliderElement.h"
+
 
 using namespace Elite;
 
@@ -14,11 +19,37 @@ App_TrafficSimulation::~App_TrafficSimulation()
 	SAFE_DELETE(m_pGridGraph);
 	SAFE_DELETE(m_pGraphRenderer);
 	SAFE_DELETE(m_pGraphEditor);
+
+	for (auto& car : m_pCarsVec)
+	{
+		SAFE_DELETE(car);
+	}
+	m_pCarsVec.clear();
+
+	for (auto pNC : m_vNavigationColliders)
+		SAFE_DELETE(pNC);
+	m_vNavigationColliders.clear();
 }
 
 //Functions
 void App_TrafficSimulation::Start()
 {
+	//Create Boundaries - keeping us away from errors
+	const float blockSize{ 2.0f };
+	const float hBlockSize{ blockSize / 2.0f };
+
+	const float width{ static_cast<float>(COLUMNS) * static_cast<float>(m_SizeCell) };
+	const float height{ static_cast<float>(ROWS) * static_cast<float>(m_SizeCell) };
+
+	m_vNavigationColliders.push_back(new NavigationColliderElement(Elite::Vector2(-hBlockSize, height * .5f), blockSize, height + blockSize * 2.0f));
+	m_vNavigationColliders.push_back(new NavigationColliderElement(Elite::Vector2(width + hBlockSize, height * .5f), blockSize, height + blockSize * 2.0f));
+	m_vNavigationColliders.push_back(new NavigationColliderElement(Elite::Vector2(width * .5f, height + hBlockSize), width, blockSize));
+	m_vNavigationColliders.push_back(new NavigationColliderElement(Elite::Vector2(width * .5f, -hBlockSize), width, blockSize));
+
+
+
+	m_AmountOfNodes = ROWS * COLUMNS;
+
 	m_pGraphEditor = new GraphEditor();
 	m_pGraphRenderer = new GraphRenderer();
 	//Set Camera
@@ -29,35 +60,107 @@ void App_TrafficSimulation::Start()
 	MakeGridGraph();
 
 	//Setup default start path
-	startPathIdx = 44;
+	// use this to debug the pathfinding
+	/*startPathIdx = 44;
 	endPathIdx = 88;
-	CalculatePath();
+	CalculatePath();*/
+
+	// create our cars
+	m_pCarsVec.reserve(m_AmountOfCars);
+	for (int i{ 0 }; i < m_AmountOfCars; ++i)
+	{
+		// get a randomPos that isn't a building
+		int randomNodeIdx{ rand() % m_AmountOfNodes };
+		// check if the index isn't in the vector
+		// this keeps multiple cars for spawning on the same node
+		while (m_pGridGraph->GetNode(randomNodeIdx)->GetTerrainType() == TerrainType::Building)
+		{
+			randomNodeIdx = rand() % m_AmountOfNodes;
+			if (m_SpawnIndexes.empty())
+				continue;
+
+			while (std::find(m_SpawnIndexes.begin(), m_SpawnIndexes.end(), randomNodeIdx) != m_SpawnIndexes.end())
+			{
+				randomNodeIdx = rand() % m_AmountOfNodes;
+			}
+
+		}
+		m_SpawnIndexes.push_back(randomNodeIdx);
+
+		const Vector2 startPos{ m_pGridGraph->GetNodeWorldPos(randomNodeIdx) };
+
+		const Vector2 endPos{ startPos }; 
+		// we use the startPos as the endPos; on startup our cars will have arrived in their BT, they will calculate their path there
+
+
+		const float maxColorValue{ 255.f };
+		const Elite::Color randColor{ randomFloat(maxColorValue) / maxColorValue ,randomFloat(maxColorValue) / maxColorValue, randomFloat(maxColorValue) / maxColorValue };
+
+
+		Car* newCar = new Car(startPos, endPos, randColor);
+
+		// create the blackboard for the car
+		Elite::Blackboard* pBlackboard = CreateBlackboard(newCar);
+
+		// create the behaviorTree
+		Elite::BehaviorTree* pBehaviorTree = new BehaviorTree(pBlackboard,
+			new Elite::BehaviorSelector(
+				{
+					new BehaviorSequence(
+						{
+							new BehaviorConditional(BT_Conditions::HasArrived),
+							new BehaviorAction(BT_Actions::CreateNewPath),
+							new BehaviorAction(BT_Actions::SetToSeek)
+						}),
+					new BehaviorSequence(
+						{
+							new BehaviorConditional(BT_Conditions::IsAtNextPos),
+							new BehaviorAction(BT_Actions::SetToSeek)
+						}),
+					new BehaviorSequence(
+						{
+							new BehaviorConditional(BT_Conditions::GiveWayToCar),
+							new BehaviorAction(BT_Actions::SlowDown)
+						}),
+					new BehaviorAction(BT_Actions::SyncSpeedToRoad)
+				}
+			));
+
+		// set the car decisionmaking
+		newCar->SetDecisionMaking(pBehaviorTree);
+		Elite::Rect test{};
+
+		m_pCarsVec.push_back(newCar);
+	}
+
 }
 
 void App_TrafficSimulation::Update(float deltaTime)
 {
 	UNREFERENCED_PARAMETER(deltaTime);
 
-	//INPUT
-	bool const middleMousePressed = INPUTMANAGER->IsMouseButtonUp(InputMouseButton::eLeft);
-	if (middleMousePressed)
-	{
-		MouseData mouseData = { INPUTMANAGER->GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eLeft) };
-		Elite::Vector2 mousePos = DEBUGRENDERER2D->GetActiveCamera()->ConvertScreenToWorld({ (float)mouseData.X, (float)mouseData.Y });
 
-		//Find closest node to click pos
-		int closestNode = m_pGridGraph->GetNodeIdxAtWorldPos(mousePos);
-		if (m_StartSelected)
-		{
-			startPathIdx = closestNode;
-			CalculatePath();
-		}
-		else
-		{
-			endPathIdx = closestNode;
-			CalculatePath();
-		}
-	}
+	// use this to debug the pathfinding
+	////INPUT
+	//bool const middleMousePressed = INPUTMANAGER->IsMouseButtonUp(InputMouseButton::eLeft);
+	//if (middleMousePressed)
+	//{
+	//	MouseData mouseData = { INPUTMANAGER->GetMouseData(Elite::InputType::eMouseButton, Elite::InputMouseButton::eLeft) };
+	//	Elite::Vector2 mousePos = DEBUGRENDERER2D->GetActiveCamera()->ConvertScreenToWorld({ (float)mouseData.X, (float)mouseData.Y });
+
+	//	//Find closest node to click pos
+	//	int closestNode = m_pGridGraph->GetNodeIdxAtWorldPos(mousePos);
+	//	if (m_StartSelected)
+	//	{
+	//		startPathIdx = closestNode;
+	//		CalculatePath();
+	//	}
+	//	else
+	//	{
+	//		endPathIdx = closestNode;
+	//		CalculatePath();
+	//	}
+	//}
 	//IMGUI
 	UpdateImGui();
 
@@ -67,6 +170,12 @@ void App_TrafficSimulation::Update(float deltaTime)
 	{
 		CalculatePath();
 	}*/
+
+
+	for (auto& currCar : m_pCarsVec)
+	{
+		currCar->Update(deltaTime);
+	}
 }
 
 void App_TrafficSimulation::Render(float deltaTime) const
@@ -75,23 +184,70 @@ void App_TrafficSimulation::Render(float deltaTime) const
 	//Render grid
 	m_pGraphRenderer->RenderGraph(m_pGridGraph, m_DebugSettings.DrawNodes, m_DebugSettings.DrawNodeNumbers, m_DebugSettings.DrawConnections, m_DebugSettings.DrawConnectionCosts);
 
-	//Render start node on top if applicable
-	if (startPathIdx != invalid_node_index)
+	// use this to debug the pathfinding
+	////Render start node on top if applicable
+	//if (startPathIdx != invalid_node_index)
+	//{
+	//	m_pGraphRenderer->HighlightNodes(m_pGridGraph, { m_pGridGraph->GetNode(startPathIdx) }, START_NODE_COLOR);
+	//}
+
+	////Render end node on top if applicable
+	//if (endPathIdx != invalid_node_index)
+	//{
+	//	m_pGraphRenderer->HighlightNodes(m_pGridGraph, { m_pGridGraph->GetNode(endPathIdx) }, END_NODE_COLOR);
+	//}
+
+	////render path below if applicable
+	//if (m_vPath.size() > 0)
+	//{
+	//	m_pGraphRenderer->HighlightNodes(m_pGridGraph, m_vPath);
+	//}
+
+	// for the first car, draw the path
+	if (m_DrawFirstPath)
 	{
-		m_pGraphRenderer->HighlightNodes(m_pGridGraph, { m_pGridGraph->GetNode(startPathIdx) }, START_NODE_COLOR);
+		for (const auto& currPoint : m_pCarsVec[0]->GetPath())
+		{
+			DEBUGRENDERER2D->DrawSolidCircle(currPoint, 2.5f, { 0,0 }, Elite::Color{ 0.5f, 1.f, 0.25f }, 0.0f);
+		}
+
+	}
+	
+	for (auto& currCar : m_pCarsVec)
+	{
+		currCar->Render(deltaTime);
 	}
 
-	//Render end node on top if applicable
-	if (endPathIdx != invalid_node_index)
-	{
-		m_pGraphRenderer->HighlightNodes(m_pGridGraph, { m_pGridGraph->GetNode(endPathIdx) }, END_NODE_COLOR);
-	}
 
-	//render path below if applicable
-	if (m_vPath.size() > 0)
+
+	if (m_DrawDebugRadius)
 	{
-		m_pGraphRenderer->HighlightNodes(m_pGridGraph, m_vPath);
+		const Elite::Vector2 carPos{ m_pCarsVec[0]->GetPosition() };
+		const float radius{ 40.f };
+		const float baseRotation{ m_pCarsVec[0]->GetRotation() };
+		float startAngle{ baseRotation - Elite::ToRadians(75.f) };
+		float endAngle{ baseRotation + Elite::ToRadians(20.f) };
+
+		// correct them if neccessary
+		if (startAngle < -static_cast<float>(M_PI))
+			startAngle = startAngle + static_cast<float>(M_PI) * 2;
+
+		if (startAngle > static_cast<float>(M_PI))
+			startAngle = startAngle - static_cast<float>(M_PI) * 2;
+
+
+		if (endAngle < -static_cast<float>(M_PI))
+			endAngle = endAngle + static_cast<float>(M_PI) * 2;
+
+
+		if (endAngle > static_cast<float>(M_PI))
+			endAngle = endAngle - static_cast<float>(M_PI) * 2;
+
+		DEBUGRENDERER2D->DrawCircle(carPos, radius, Elite::Color{ 0.f, 1.f, 0.f }, 0.0f);
+		DEBUGRENDERER2D->DrawSegment(carPos, Elite::Vector2{ cosf(startAngle) * radius + carPos.x, sinf(startAngle) * radius + carPos.y }, Elite::Color{ 0.f, 0.f, 1.f }, 0.0f);
+		DEBUGRENDERER2D->DrawSegment(carPos, Elite::Vector2{ cosf(endAngle) * radius + carPos.x, sinf(endAngle) * radius + carPos.y }, Elite::Color{ 0.f, 0.f, 1.f }, 0.0f);
 	}
+	
 
 }
 
@@ -270,8 +426,12 @@ void App_TrafficSimulation::UpdateImGui()
 
 		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
 
-		ImGui::Text("Left Mouse Button");
-		ImGui::Text("controls");
+		ImGui::Text("Car Debug");
+		ImGui::Checkbox("Draw Path of First Car", &m_DrawFirstPath);
+		ImGui::Checkbox("Draw vision of First Car", &m_DrawDebugRadius);
+		
+		// use this to debug the pathfinding
+		/*ImGui::Text("controls");
 		std::string buttonText{ "" };
 		if (m_StartSelected)
 			buttonText += "Start Node";
@@ -281,11 +441,12 @@ void App_TrafficSimulation::UpdateImGui()
 		if (ImGui::Button(buttonText.c_str()))
 		{
 			m_StartSelected = !m_StartSelected;
-		}
+		}*/
 
 		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
 
 		ImGui::Checkbox("Grid", &m_DebugSettings.DrawNodes);
+		
 		ImGui::Checkbox("NodeNumbers", &m_DebugSettings.DrawNodeNumbers);
 		ImGui::Checkbox("Connections", &m_DebugSettings.DrawConnections);
 		ImGui::Checkbox("Connections Costs", &m_DebugSettings.DrawConnectionCosts);
@@ -419,4 +580,17 @@ void App_TrafficSimulation::ChangeIntersectionConnectionCosts(int firstNode, int
 	m_pGridGraph->GetConnection(secondNode, thirdNode)->SetCost(cost); // horizontal
 	m_pGridGraph->GetConnection(thirdNode, fourthNode)->SetCost(cost); // vertical
 	m_pGridGraph->GetConnection(fourthNode, firstNode)->SetCost(cost); // horizontal
+}
+
+Elite::Blackboard* App_TrafficSimulation::CreateBlackboard(Car* currCar)
+{
+	Elite::Blackboard* pBlackboard = new Elite::Blackboard();
+
+	pBlackboard->AddData("Car", currCar);
+	pBlackboard->AddData("GridGraph", m_pGridGraph);
+	pBlackboard->AddData("Heuristic", m_pHeuristicFunction);
+	pBlackboard->AddData("CarsVector", &m_pCarsVec);
+
+
+	return pBlackboard;
 }

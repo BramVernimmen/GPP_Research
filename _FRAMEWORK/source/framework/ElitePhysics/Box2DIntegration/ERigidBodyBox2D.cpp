@@ -232,6 +232,13 @@ void Elite::RigidBodyBase<Elite::Vector2, Elite::Vector2>::SetLinearDamping(floa
 }
 
 template <>
+void Elite::RigidBodyBase<Elite::Vector2, Elite::Vector2>::SetAngularDamping(float damping)
+{
+	auto pBody = static_cast<b2Body*>(m_pBody);
+	pBody->SetAngularDamping(damping);
+}
+
+template <>
 float Elite::RigidBodyBase<Elite::Vector2, Elite::Vector2>::GetLinearDamping()
 {
 	auto pBody = static_cast<b2Body*>(m_pBody);

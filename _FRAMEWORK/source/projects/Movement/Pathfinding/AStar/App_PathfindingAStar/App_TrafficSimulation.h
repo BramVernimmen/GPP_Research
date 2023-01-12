@@ -13,6 +13,9 @@
 //-----------------------------------------------------------------
 // Application
 //-----------------------------------------------------------------
+class Car;
+class NavigationColliderElement;
+
 class App_TrafficSimulation final : public IApp
 {
 public:
@@ -26,6 +29,13 @@ public:
 	void Render(float deltaTime) const override;
 
 private:
+
+	const int m_AmountOfCars{ 20 };
+	std::vector<Car*> m_pCarsVec{};
+	std::vector<int> m_SpawnIndexes{};
+
+	std::vector<NavigationColliderElement*> m_vNavigationColliders = {};
+
 	struct DebugSettings
 	{
 		bool DrawNodes{ true };
@@ -33,6 +43,10 @@ private:
 		bool DrawConnections{ false };
 		bool DrawConnectionCosts{ false };
 	};
+
+	bool m_DrawFirstPath{ true };
+	bool m_DrawDebugRadius{ false };
+
 
 	//Datamembers
 	const bool ALLOW_DIAGONAL_MOVEMENT = true;
@@ -42,8 +56,9 @@ private:
 	//Grid datamembers
 	static const int COLUMNS = 20;
 	static const int ROWS = 10;
+	int m_AmountOfNodes{};
 	unsigned int m_SizeCell = 15;
-	Elite::GridGraph<Elite::GridTerrainNode, Elite::GraphConnection>* m_pGridGraph;
+	Elite::GridGraph<Elite::GridTerrainNode, Elite::GraphConnection>* m_pGridGraph = nullptr;
 
 	//Pathfinding datamembers
 	int startPathIdx = invalid_node_index;
@@ -69,8 +84,9 @@ private:
 	void CreateConnectionsVertical(int startNode, int endNode, float cost = 30.f);
 	void CreateConnectionsHorizontal(int startNode, int endNode, float cost = 30.f);
 
-	void ChangeIntersectionConnectionCosts(int firstNode, int secondNode, int thirdNode, int fourthNode, float cost = 500.f);
+	void ChangeIntersectionConnectionCosts(int firstNode, int secondNode, int thirdNode, int fourthNode, float cost = 50.f);
 
+	Elite::Blackboard* CreateBlackboard(Car* currCar);
 
 	//C++ make the class non-copyable
 	App_TrafficSimulation(const App_TrafficSimulation&) = delete;

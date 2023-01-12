@@ -45,6 +45,7 @@ namespace Elite
 		void SetAngularVelocity(const translationType& angularVelocity);
 
 		void SetLinearDamping(float damping);
+		void SetAngularDamping(float damping);
 		float GetLinearDamping();
 
 		void AddForce(const translationType& force, EForceMode mode, bool autoWake = true);

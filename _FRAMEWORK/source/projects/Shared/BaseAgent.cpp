@@ -31,14 +31,16 @@ void BaseAgent::Render(float dt)
 	auto r = Elite::ToRadians(150.f);
 
 	//EliteDebugRenderer2D::GetInstance()->DrawSolidCircle(GetPosition(), m_Radius, { 0,0 }, m_BodyColor);
-	DEBUGRENDERER2D->DrawSolidCircle(GetPosition(), m_Radius, { 0,0 }, m_BodyColor);
+	//DEBUGRENDERER2D->DrawSolidCircle(GetPosition(), m_Radius, { 0,0 }, m_BodyColor);
+	DEBUGRENDERER2D->DrawSolidCircle(GetPosition(), m_Radius, { 0,0 }, m_BodyColor, 0.0f);
 
 	std::vector<Elite::Vector2> points;
 	points.push_back(Elite::Vector2(static_cast<float>(cos(o)) * m_Radius, static_cast<float>(sin(o)) * m_Radius) + p);
 	points.push_back(Elite::Vector2(static_cast<float>(cos(o + r)) * m_Radius, static_cast<float>(sin(o + r)) * m_Radius) + p);
 	points.push_back(Elite::Vector2(static_cast<float>(cos(o - r)) * m_Radius, static_cast<float>(sin(o - r)) * m_Radius) + p);
 
-	DEBUGRENDERER2D->DrawSolidPolygon(&points[0], 3, { 0,0,0,1 }, DEBUGRENDERER2D->NextDepthSlice());
+	//DEBUGRENDERER2D->DrawSolidPolygon(&points[0], 3, { 0,0,0,1 }, DEBUGRENDERER2D->NextDepthSlice());
+	DEBUGRENDERER2D->DrawSolidPolygon(&points[0], 3, { 0,0,0,1 }, 0.0f);
 }
 void BaseAgent::TrimToWorld(float worldBounds, bool isWorldLooping) const {
 	TrimToWorld({ 0, 0 }, { worldBounds, worldBounds }, isWorldLooping);

@@ -182,5 +182,33 @@ namespace Elite
 	}
 #pragma endregion //Rect
 
+	inline bool IsPointInCone(const Vector2& point, const Elite::Vector2& circleCenter, float circleRadius, float startAngle, float endAngle)
+	{
+		// first check if it's in the radius
+		// if it isn't; early exit return false
+		float distance{ Elite::DistanceSquared(point, circleCenter) };
+		if (distance > circleRadius * circleRadius)
+			return false;
+
+		float alpha{ atan2f(point.y - circleCenter.y, point.x - circleCenter.x) };
+		if (startAngle < endAngle)
+			if (startAngle <= alpha && alpha <= endAngle)
+				return true;
+
+		if (startAngle > endAngle)
+		{
+			if (alpha >= startAngle)
+				return true;
+
+			if (alpha <= endAngle)
+				return true;
+		}
+
+
+		return false;
+
+		// https://stackoverflow.com/questions/6270785/how-to-determine-whether-a-point-x-y-is-contained-within-an-arc-section-of-a-c
+	}
+
 }
 #endif
