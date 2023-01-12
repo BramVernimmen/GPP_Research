@@ -81,8 +81,8 @@ It inherits from the SteeringAgent Class from our teachers. This one works with 
 
 In this class we will be making a SteeringBehavior that Uses the "Seek" methode. It will calculate a steering based on the next point in our path.
 
-This class will also contain our path, which will be a list of Points. We want to visit every Point in this list, after that calculate a new path.
-<br />
+This class will also contain our path, which will be a list of Points. We want to visit every Point in this list, after that calculate a new path.<br /><br />
+
 #### ***The Behavior Tree***
 <br />
 <br />
@@ -94,15 +94,16 @@ This Behavior Tree will not be complicated. When updating our BT, we will be che
   - If we are at our next position in our path; we remove this from our path and seek the next point;
   - we change our speed depending on the connection cost.
   
- These are 3 really simpel things to do, that will cause our car to move.
- <br />
+ These are 3 really simpel things to do, that will cause our car to move. <br /> <br />
+
  #### ***Spawning the Car***
  <br />
  <br />
  We have our Car class and a BehaviorTree that will be capable of moving the car; so now we just spawn them.
- We need to spawn the Car at the center of a random Cell of the Grid. Prepare some safety checks; we don't want a car to spawn in a building, and we might aswell take care of keeping track in which Cell a car has spawned. This will be used when spawning multiple cars to avoid overlap on spawn.
+ We need to spawn the Car at the center of a random Cell of the Grid. Prepare some safety checks; we don't want a car to spawn in a building, and we might aswell take care of keeping track in which Cell a car has spawned. This will be used when spawning multiple cars to avoid overlap on spawn. <br /> <br />
  
- When a starting position has been decided, we can make the end Position the same as our start. Our Behavior Tree will see that we are in the final cell and will calculate a new path for us!
+ When a starting position has been decided, we can make the end Position the same as our start. Our Behavior Tree will see that we are in the final cell and will calculate a new path for us! <br /><br />
+ If we are going for random things; might aswell give the car a random color.
  
  
  After doing all these small things; we can finally see a car moving!
@@ -112,4 +113,57 @@ This Behavior Tree will not be complicated. When updating our BT, we will be che
  The car is moving really slow, because of the RigidBody system it has a hard time turning, so making it go faster will make the car go off track.
  
  Slowing the car down by 4 times is currently the only option.
+
+### Step 3 - Making Multiple Cars Aware <br /> <br />
+
+Spawning multiple cars is not a problem, thanks to my code I just have to change the value of an integer; m_AmountOfCars.
+
+So lets's do that!
+
+ ![Multiple_Cars_Problem_Image](/Assets/Images/Gifs/Step3_MultipleCars.gif)
+ 
+ Well then...
+ 
+ At least the cars spawn correctly, but there is something really obviously wrong here. <br />
+ **They are bumping into each other...** <br /><br />
+ 
+ We obviously need to fix this; add a way to detect other cars in our Behavior Tree. <br />
+
+  - If we have arrived at our final position; we calculate a new path.
+  - If we are at our next position in our path; we remove this from our path and seek the next point;
+  - ***Do we need to give way to other cars; Slow down***
+  - we change our speed depending on the connection cost. <br /> <br />
+
+
+But how do we check if we need to give way to other cars?
+
+To start off, we make a cone of vision where we can detect other cars just like this.
+
+ ![ConeOfVision_Image](/Assets/Images/Stills/Step3_VisionCone.png)
+ 
+ 
+Remeber, give way to cars coming from the right. They have a priority.
+
+To see if the car is coming from the right we need to check the angle between the Direction Vector of each car. <br />
+There are 4 possible outcomes with this angle:
+
+  - The angle is ~0; the other car is looking in front of us.
+  - The angle is ~Pi || ~-Pi; the other car is looking towards us.
+  - The angle is ~-Pi / 2; the other car is to our left.
+  - The angle is ~Pi / 2; **the other car is to our right.**  <br /> <br />
+
+
+There are 2 cases where we need to slow down:
+  
+  - When the car is to our right; we need to stop moving.
+  - When the car in front of us is too close; we need to stop moving.
+
+Before slowing down, make sure to check that the other car is moving. Doing this check will prevent us from stopping while other cars are at a red light.
+
+
+When we set our MaxLinearSpeed to 0.0f to slow down, we can see that our cars will stop when needed!
+
+ ![Cars_GivingWay_Image](/Assets/Images/Gifs/Step3_GivingWay.gif)
+
+
 
